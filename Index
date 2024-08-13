@@ -1,0 +1,78 @@
+from notion_client import Client
+
+# Initialize Notion client with your secret token
+notion = Client(auth="your-secret-token")
+
+# Define the structure of the page
+page_structure = [
+    {"title": "My Documents"},
+    {"title": "Personal", "subpages": [
+        {"title": "Finances", "subpages": [
+            "Bank Statements", "Tax Returns", "Receipts", "Investments"]},
+        {"title": "Health", "subpages": [
+            "Medical Records", "Insurance", "Fitness"]},
+        {"title": "Hobbies", "subpages": [
+            "Photography", "Music", "Travel"]},
+        {"title": "Household", "subpages": [
+            "Bills", "Maintenance", "Home Improvements"]},
+        {"title": "Education", "subpages": [
+            "Courses", "Certifications", "Learning Materials"]}
+    ]},
+    {"title": "Professional", "subpages": [
+        {"title": "Career", "subpages": [
+            "Resume and CVs", "Job Applications", "Certifications", "Performance Reviews"]},
+        {"title": "Work Projects", "subpages": [
+            "Project 1 Name", "Project 2 Name", "Meeting Notes", "Reports", "Presentations"]},
+        {"title": "Networking", "subpages": [
+            "Contacts", "LinkedIn", "Business Cards"]}
+    ]},
+    {"title": "Family", "subpages": [
+        {"title": "Family Members", "subpages": [
+            {"title": "Spouse", "subpages": ["Documents", "Photos"]},
+            {"title": "Children", "subpages": [
+                "School", "Activities", "Health"]}
+        ]},
+        {"title": "Events", "subpages": [
+            "Birthdays", "Holidays", "Reunions"]},
+        {"title": "Ancestry", "subpages": [
+            "Genealogy", "Family Tree", "Historical Documents"]}
+    ]},
+    {"title": "Miscellaneous", "subpages": [
+        {"title": "Legal", "subpages": [
+            "Wills and Testaments", "Contracts", "IDs and Passports"]},
+        {"title": "Vehicles", "subpages": [
+            "Insurance", "Maintenance Records", "Registration"]}
+    ]}
+]
+
+# Function to create a page
+def create_page(parent_page_id, title, children=None):
+    page = notion.pages.create(
+        parent={"page_id": parent_page_id},
+        properties={
+            "title": [
+                {
+                    "text": {
+                        "content": title
+                    }
+                }
+            ]
+        },
+        children=children if children else []
+    )
+    return page['id']
+
+# Function to recursively create pages
+def create_pages_recursive(parent_page_id, structure):
+    for item in structure:
+        page_id = create_page(parent_page_id, item["title"])
+        if "subpages" in item:
+            create_pages_recursive(page_id, item["subpages"])
+
+# Replace this with your Notion root page ID where the structure should be created
+root_page_id = "your-root-page-id"
+
+# Create the page structure
+create_pages_recursive(root_page_id, page_structure)
+
+print("Notion structure created successfully!")
